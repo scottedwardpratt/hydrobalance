@@ -1,21 +1,20 @@
-#include "msu_hydro2uds/hydro2uds.h"
+#include "msu_hydrobalance/hydro2uds.h"
 #include "msu_commonutils/randy.h"
-#include "msu_hydro2uds/eos.h"
-#include "msu_hydro2uds/charge.h"
-
+#include "msu_hydrobalance/eos.h"
+#include "msu_hydrobalance/charge.h"
 using namespace std;
 
 CHydroBalance *CHydroMesh::hb=NULL;
 
 CHydroBalance::CHydroBalance(){
+	printf("WTF\n");
 };
 
 CHydroBalance::CHydroBalance(string parfilename,int ranseed){
 	parmap.ReadParsFromFile(parfilename);
-	Tf=0.001*parmap.getD("FREEZEOUT_TEMP",155.0);
+	Tf=parmap.getD("FREEZEOUT_TEMP",0.155);
 	SIGMA0=parmap.getD("SIGMA0",0.5);
 	DiffusionRatio=parmap.getD("DIFFUSION_RATIO",1.0);
-	printf("DiffusionRatio=%g\n",DiffusionRatio);
 	eos=new CEoS(&parmap);
 	eos->ReadEoS_PST();
 	eos->BuildMap();
@@ -36,7 +35,7 @@ CHydroBalance::CHydroBalance(string parfilename,int ranseed){
 	CHydroMesh::GetDimensions(NX,NY,DX,DY,DELTAU,TAU0,XMIN,XMAX,YMIN,YMAX);
 	WRITE_TRAJ=parmap.getB("HB_WRITE_TRAJ",false);
 	
-	NSAMPLE_HYDRO2UDS=parmap.getD("NSAMPLE_HYDRO2UDS",4);
+	NSAMPLE_HYDRO2UDS=parmap.getD("NSAMPLE_HYDRO2UDS",2);
 	randy=new Crandy(ranseed);
 	mesh=newmesh=oldmesh=NULL;
 	Ncollisions=0;

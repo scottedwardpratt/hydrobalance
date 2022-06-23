@@ -6,20 +6,20 @@
 
 using namespace std;
 
-vector<double> CHBEoS::epsilon_PST,CHBEoS::P_PST,CHBEoS::s_PST,CHBEoS::T_PST;
-vector<double> CHBEoS::epsilon_claudia,CHBEoS::P_claudia,CHBEoS::s_claudia,CHBEoS::T_claudia;
-vector<double> CHBEoS::twopiTD,CHBEoS::Tdiff;
-vector<double> CHBEoS::chill_overs_claudia,CHBEoS::chiud_overs_claudia,CHBEoS::chils_overs_claudia,CHBEoS::chiss_overs_claudia;
-vector<double> CHBEoS::chill_HSC,CHBEoS::chiud_HSC,CHBEoS::chils_HSC,CHBEoS::chiss_HSC;
-vector<double> CHBEoS::dDdT;
-mapdi CHBEoS::etmap;
+vector<double> CEoS::epsilon_PST,CEoS::P_PST,CEoS::s_PST,CEoS::T_PST;
+vector<double> CEoS::epsilon_claudia,CEoS::P_claudia,CEoS::s_claudia,CEoS::T_claudia;
+vector<double> CEoS::twopiTD,CEoS::Tdiff;
+vector<double> CEoS::chill_overs_claudia,CEoS::chiud_overs_claudia,CEoS::chils_overs_claudia,CEoS::chiss_overs_claudia;
+vector<double> CEoS::chill_HSC,CEoS::chiud_HSC,CEoS::chils_HSC,CEoS::chiss_HSC;
+vector<double> CEoS::dDdT;
+mapdi CEoS::etmap;
 
-CresList *CHBEoS::reslist=NULL;
+CresList *CEoS::reslist=NULL;
 
-CHBEoS::CHBEoS(){	
+CEoS::CEoS(){	
 }
 
-CHBEoS::CHBEoS(CparameterMap *parmapset){
+CEoS::CEoS(CparameterMap *parmapset){
 	parmap=parmapset;
 	reslist=new CresList(parmap);
 	ReadDiffusionData();
@@ -27,7 +27,7 @@ CHBEoS::CHBEoS(CparameterMap *parmapset){
 	//FillOutdDdT();
 };
 
-void CHBEoS::ReadDiffusionData(){
+void CEoS::ReadDiffusionData(){
 	string dirname=parmap->getS("LATTICEDATA_DIRNAME","../latticedata");
 	string filename=dirname+"/diffusion.dat";
 	char dummy[100];
@@ -47,7 +47,7 @@ void CHBEoS::ReadDiffusionData(){
 	fclose(fptr);
 }
 
-void CHBEoS::FillOutdDdT(){
+void CEoS::FillOutdDdT(){
 	int ndata=epsilon_PST.size();
 	dDdT.resize(ndata);
 	Eigen::Matrix3d chi0,chi1,chi2,chiinv0,chiinv1,chiinv2,Dmat;
@@ -95,7 +95,7 @@ void CHBEoS::FillOutdDdT(){
 	}
 }
 
-double CHBEoS::GetD(double T){
+double CEoS::GetD(double T){
 	int i0;
 	double result,delT;
 	if(T>=Tdiff[0] && T<=Tdiff[Tdiff.size()-1]){
@@ -115,12 +115,12 @@ double CHBEoS::GetD(double T){
 		delT=Tdiff[i0]-Tdiff[i0-1];
  		result=twopiTD[i0]+(T-Tdiff[i0])*(twopiTD[i0]-twopiTD[i0-1])/delT;
 	}
-	result=result*HBARC*0.001/(2.0*PI*T);
+	result=result*HBARC_GEV/(2.0*PI*T);
 	//result*=0.001;
 	return result;
 }
 
-void CHBEoS::ReadChiData_HSC(){
+void CEoS::ReadChiData_HSC(){
 	string dirname=parmap->getS("LATTICEDATA_DIRNAME","../latticedata");
 	string filename;
 	double error,chi0;
@@ -178,7 +178,7 @@ void CHBEoS::ReadChiData_HSC(){
 		chiud_HSC[idata]=chiLL[idata]-2.0*chiI[idata];
 		chils_HSC[idata]=2.25*(chiB[idata]-(2.0/9.0)*chiLL[idata]-(1.0/9.0)*chiSS[idata]-(2.0/9.0)*chiud_HSC[idata]);
 		//chils[idata]=-4.5*(chiQ[idata]-(5.0/9.0)*chiLL[idata]-(1.0/9.0)*chiSS[idata]+(4.0/9.0)*chiud[idata]);
-		printf("-------  T=%g --------\n",Tarray[idata]);
+		printf("-------  T=%g MeV --------\n",Tarray[idata]);
 		printf("%8.5f %8.5f %8.5f\n",chill_HSC[idata],chiud_HSC[idata],chils_HSC[idata]);
 		printf("%8.5f %8.5f %8.5f\n",chiud_HSC[idata],chill_HSC[idata],chils_HSC[idata]);
 		printf("%8.5f %8.5f %8.5f\n",chils_HSC[idata],chils_HSC[idata],chiss_HSC[idata]);
@@ -193,7 +193,7 @@ void CHBEoS::ReadChiData_HSC(){
 	}
 }
 
-void CHBEoS::ReadChiData_Claudia(){
+void CEoS::ReadChiData_Claudia(){
 	string dirname=parmap->getS("LATTICEDATA_DIRNAME","latticedata");
 	string filename;
 	int idata;
@@ -202,6 +202,7 @@ void CHBEoS::ReadChiData_Claudia(){
 	FILE *fptr;
 	// You will read in chi/s, not chi
 	filename=dirname+"/chi.dat";
+	printf("will read chidata from %s\n",filename.c_str());
 	fptr=fopen(filename.c_str(),"r");
 	T_claudia.resize(ndata);
 	chill_overs_claudia.resize(ndata);
@@ -212,14 +213,16 @@ void CHBEoS::ReadChiData_Claudia(){
 	for(idata=4;idata<ndata;idata++){
 		fscanf(fptr,"%lf %lf %lf %lf %lf",
 		&T_claudia[idata],&chill_overs_claudia[idata],&chiud_overs_claudia[idata],&chils_overs_claudia[idata],&chiss_overs_claudia[idata]);
+		T_claudia[idata]*=0.001;
 	}
 	fclose(fptr);
 }
 
-void CHBEoS::GetChiOverS_Claudia(){
-	double delT=0.005,Tmax=0.4,w0,w1,Tm=T;
+void CEoS::GetChiOverS_Claudia(){
+	double delT=5.0,Tmax=0.4,w0,w1,Tm=1000.0*T;
 	const int ndata=81;
 	int iT0;
+	//printf("In CEoS::GetChiOverS_Claudia, T=%g, Tm=%g\n",T,Tm);
 	if(Tm<20){
 		chill=chill_overs_claudia[5]*Tm*s/20.0;
 		chiud=chiud_overs_claudia[5]*Tm*s/20.0;
@@ -235,7 +238,7 @@ void CHBEoS::GetChiOverS_Claudia(){
 	else{
 		iT0=lrint(floor(Tm/delT));
 		if(iT0>=ndata-1){
-			printf("iT0 out of range in CHBEoS::GetChiOverS_Claudia()\n");
+			printf("iT0 out of range in CEoS::GetChiOverS_Claudia()\n");
 			exit(1);
 		}
 		w1=(Tm-delT*iT0)/delT;
@@ -248,7 +251,9 @@ void CHBEoS::GetChiOverS_Claudia(){
 	
 }
 
-void CHBEoS::CalcEoS_PST(){
+void CEoS::CalcEoS_PST(){
+	Eigen::Matrix3d chi;
+	Eigen::Matrix3d sigma;
 	string filename
 		=parmap->getS("EOS_PSTDATA_FILENAME","../eos/EOS_tables/EOS_PST.dat");
 	FILE *fptr=fopen(filename.c_str(),"r");
@@ -275,14 +280,12 @@ void CHBEoS::CalcEoS_PST(){
 	int nres=reslist->resmap.size();
 	vector<double> density;
 	vector<double> maxweight;
-	Eigen::Matrix3d chi,sigma;
 	density.resize(nres);
 	maxweight.resize(nres);
 	ne=ie;
 	for(ie=0;ie<ne;ie++){
 		if(T_PST[ie]<TQGP){
 			TT=T_PST[ie];
-			//reslist->CalcEoSandChi(TT*1000.0,Ph,eh,nh,density,maxweight,chi);
 			MSU_EOS::CalcEoSandTransportCoefficients(TT,reslist,eh,Ph,nh,density,chi,sigma);
 			sh=(Ph+eh)/TT;
 			if(T<TH){
@@ -309,7 +312,7 @@ void CHBEoS::CalcEoS_PST(){
 	
 }
 
-void CHBEoS::ReadEoS_PST(){
+void CEoS::ReadEoS_PST(){
 	string filename
 		=parmap->getS("EOS_PSTDATA_FILENAME","../eos/EOS_tables/EOS_PST.dat");
 	FILE *fptr=fopen(filename.c_str(),"r");
@@ -340,7 +343,7 @@ void CHBEoS::ReadEoS_PST(){
 	
 }
 
-void CHBEoS::BuildMap(){
+void CEoS::BuildMap(){
 	unsigned int ie;
 	//printf("check BuildMap, epsilon_PST.size()=%d\n",int(epsilon_PST.size()));
 	for(ie=0;ie<epsilon_PST.size();ie++){
@@ -349,7 +352,9 @@ void CHBEoS::BuildMap(){
 	}
 }
 
-void CHBEoS::GetEoSFromEpsilon_PST(double epsilonset){
+void CEoS::GetEoSFromEpsilon_PST(double epsilonset){
+	Eigen::Matrix3d chi;
+	Eigen::Matrix3d sigma;
 	double depsilon=0.02,w0,TT;
 	int ie0,ndata;
 	epsilon=epsilonset;
@@ -372,21 +377,21 @@ void CHBEoS::GetEoSFromEpsilon_PST(double epsilonset){
 		printf("TESTING, s=%g\n",s);
 		double Ph,eh,nh;
 		int nres=reslist->resmap.size();
-		vector<double> density,maxweight;
-		Eigen::Matrix3d chi,sigma;
+		vector<double> density,maxweight;;
 		density.resize(nres);
 		maxweight.resize(nres);
-		//reslist->CalcEoSandChi(TT*1000.0,Ph,eh,nh,density,maxweight,chi);
 		MSU_EOS::CalcEoSandTransportCoefficients(TT,reslist,eh,Ph,nh,density,chi,sigma);
+		Ph=Ph/1000.0;
+		eh=eh/1000.0;
 	}
 }
 
-void CHBEoS::Print(){
+void CEoS::Print(){
 	printf("---- T=%g, P=%g, epsilon=%g, s=%g  ----\n",T,P,epsilon,s);
 	printf("chill/s=%g, chiud/s=%g, chils/s=%g, chiss/s=%g\n",chill,chiud,chils,chiss);
 }
 
-void CHBEoS::PrintChi(){
+void CEoS::PrintChi(){
 	Eigen::Matrix3d chimat;
 	chimat(0,0)=chimat(1,1)=chill;
 	chimat(1,0)=chimat(0,1)=chiud;
@@ -397,7 +402,7 @@ void CHBEoS::PrintChi(){
 	cout << chimat << endl;
 }
 
-void CHBEoS::GetEoSFromT_PST(double Tset){
+void CEoS::GetEoSFromT_PST(double Tset){
 	mapdi::iterator iter;
 	int ie;
 	double w0,delT;
@@ -413,21 +418,5 @@ void CHBEoS::GetEoSFromT_PST(double Tset){
 	epsilon=w0*epsilon_PST[ie]+(1.0-w0)*epsilon_PST[ie+1];
 	P=w0*P_PST[ie]+(1.0-w0)*P_PST[ie+1];
 	s=w0*s_PST[ie]+(1.0-w0)*s_PST[ie+1];
-	/*
-	if(fabs(T-0.140)<0.000001){
-		printf("TESTING, T=%g, P=%g, s=%g,nres=%d\n",
-		T,P,s,int(reslist->resmap.size()));
-		double Ph=0,eh=0,nh,sh;
-		int a,nres=reslist->resmap.size();
-		vector<double> density;
-		vector< vector<double> > chi;
-		density.resize(nres);
-		chi.resize(3);
-		for(a=0;a<3;a++)
-			chi[a].resize(3);
-		//reslist->CalcEoSandChi(T*1000.0,Ph,eh,nh,density,chi);
-		MSU_EOS::CalcEoSandTransportCoefficients(T,reslist,eh,Ph,nh,density,chi,sigma);
-		sh=(Ph+eh)/T;
-		printf("s=%g, sh=%g\n",s,sh);
-	}*/	
+	
 }
