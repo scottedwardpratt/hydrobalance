@@ -1,5 +1,5 @@
-#include "msu_hydrobalance/hydro2uds.h"
-#include "msu_hydrobalance/charge.h"
+#include "msu_hydro2uds/hydro2uds.h"
+#include "msu_hydro2uds/charge.h"
 #include "msu_sampler/hyper.h"
 #include "msu_commonutils/misc.h"
 
@@ -70,7 +70,7 @@ bool CHydroBalance::ReadOSCAR(CHydroMesh *hydromesh){
 			if(r>rmax && t>=Tf)
 				rmax=r;
 			Misc::BoostToCM(u,pi,pitilde);
-			hydromesh->pitildexy[ix][iy]=pitilde[1][1];
+			hydromesh->pitildexx[ix][iy]=pitilde[1][1];
 			hydromesh->pitildexy[ix][iy]=pitilde[1][2];
 			hydromesh->pitildeyy[ix][iy]=pitilde[2][2];
 		
@@ -125,9 +125,12 @@ void CHydroBalance::WriteCharges(){
 		//("writing, balanceID=%d\n",balanceID);
 		charge=it->second;
 		hyper=&(charge->hyper);
+
 		fprintf(fptr,"%6d %2d %2d %2d %15.9f %15.9f %15.9f %15.9f %15.9f %15.9e %15.9e %15.9e %15.9e %15.9e %15.9e %15.9e %15.9e\n",
 		balanceID,charge->q[0],charge->q[1],charge->q[2],charge->weight,charge->tau,charge->eta,
-		charge->x,charge->y,hyper->u[1],hyper->u[2],hyper->dOmega[0],hyper->dOmega[1],hyper->dOmega[2],hyper->pitilde[1][1],hyper->pitilde[2][2],hyper->pitilde[1][2]);
+		charge->x,charge->y,hyper->u[1],hyper->u[2],hyper->dOmega[0],hyper->dOmega[1],
+		hyper->dOmega[2],hyper->pitilde[1][1],hyper->pitilde[2][2],hyper->pitilde[1][2]);
+
 		if(WRITE_TRAJ){
 			if(charge->trajinfo!=NULL){
 				for(icharge=0;icharge<charge->trajinfo->x.size();icharge++){
@@ -257,7 +260,7 @@ void CHydroBalance::WriteHyper(){
 	for(it=hyperlist.begin();it!=hyperlist.end();++it){
 		hyper=*it;
 		fprintf(fptr,"%13.7e %13.7e %13.7e %13.7e %13.7e %13.7e %13.7e %13.7e %13.7e %13.7e %13.7e\n",
-		hyper->tau,hyper->r[1],hyper->r[2],hyper->u[1],hyper->u[2],hyper->dOmega[0],hyper->dOmega[1],hyper->dOmega[2],hyper->pitilde[1][1],hyper->pitilde[2][2],hyper->pitilde[1][2]);
+		hyper->tau,hyper->r[1],hyper->r[2],hyper->u[1],hyper->u[2],hyper->dOmega[0],hyper->dOmega[1],hyper->dOmega[2],hyper->pitilde[1][2],hyper->pitilde[2][2],hyper->pitilde[1][2]);
 	}
 	printf("Wrote %d hyper-elements\n",int(hyperlist.size()));
 	fclose(fptr);

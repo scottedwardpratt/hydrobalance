@@ -1,4 +1,4 @@
-#include "msu_hydrobalance/hydro2uds.h"
+#include "msu_hydro2uds/hydro2uds.h"
 #include "msu_sampler/hyper.h"
 #include "msu_commonutils/misc.h"
 
@@ -7,7 +7,8 @@ using namespace std;
 void CHydroBalance::HyperFind(){
 	int ix,iy,a,b;
 	double dTdx,dTdy,dTdt;
-	Chyper hyper,*newhyper;
+	Chyper hyper;
+	Chyper *newhyper;
 	bool GGTt,GGTx,GGTy;
 	if(!tau0check){
 		for(ix=1;ix<mesh->NX-1;ix++){
@@ -21,7 +22,7 @@ void CHydroBalance::HyperFind(){
 					hyper.tau=0.5*(newmesh->tau+mesh->tau);
 					GetXYBar(ix,iy,hyper.r[1],hyper.r[2]);
 					GetUxyBar(ix,iy,hyper.u[1],hyper.u[2]);
-					GetPiTildeBar(ix,iy,hyper.pitilde[1][1],hyper.pitilde[1][2],
+					GetPiTildeBar(ix,iy,hyper.pitilde[1][1],hyper.pitilde[1][0],
 					hyper.pitilde[2][2]);
 					GetTBar(ix,iy,hyper.T0);
 					if(GetDOmega(dTdt,dTdx,dTdy,
