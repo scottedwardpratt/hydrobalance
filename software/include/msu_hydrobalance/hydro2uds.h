@@ -2,16 +2,15 @@
 #define __HYDROBALANCE_H__
 
 //#include <boost/math/special_functions/bessel.hpp>
-#include "msu_sampler/hyper.h"
 #include "msu_commonutils/commondefs.h"
 #include "msu_commonutils/parametermap.h"
-#include "msu_hydrobalance/eos.h"
+#include "msu_sampler/hyper.h"
 
 using namespace std;
 
 class CHydroBalance{
 public:
-	CHBEoS *eos;
+	CEoS *eos;
 	double DELTAU,TAU0,XMIN,XMAX,YMIN,YMAX,DX,DY;
 	int NX,NY,ntraj;
 	double NSAMPLE_HYDRO2UDS;

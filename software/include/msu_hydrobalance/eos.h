@@ -1,5 +1,5 @@
-#ifndef __HBEoS_H__
-#define __HBEoS_H__
+#ifndef __EoS_H__
+#define __EoS_H__
 
 #include "msu_commonutils/commondefs.h"
 
@@ -7,13 +7,13 @@ using namespace std;
 typedef multimap<double,int> mapdi;
 typedef pair<double,int> pairdi;
 
-class CHBEoS{
+class CEoS{
 public:
 	CparameterMap *parmap;
 	double T,P,epsilon,s;
 	double chill,chiud,chils,chiss;
-	CHBEoS(CparameterMap *parmapset);
-	CHBEoS();
+	CEoS(CparameterMap *parmapset);
+	CEoS();
 	void ReadDiffusionData();
 	// get D in fm
 	static double GetD(double T);
