@@ -1,5 +1,5 @@
-#ifndef __HYDROBALANCE_H__
-#define __HYDROBALANCE_H__
+#ifndef __HYDRO2UDS_H__
+#define __HYDRO2UDS_H__
 
 //#include <boost/math/special_functions/bessel.hpp>
 #include "msu_commonutils/commondefs.h"
@@ -10,7 +10,7 @@ using namespace std;
 
 class CHydroBalance{
 public:
-	CEoS *eos;
+	CHBEoS *eos;
 	double DELTAU,TAU0,XMIN,XMAX,YMIN,YMAX,DX,DY;
 	int NX,NY,ntraj;
 	double NSAMPLE_HYDRO2UDS;

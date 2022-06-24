@@ -1,5 +1,5 @@
 #include "msu_hydrobalance/hydro2uds.h"
-#include "msu_hydrobalance/charge.h"
+#include "msu_hydrobalance/hbcharge.h"
 #include "msu_sampler/hyper.h"
 #include "msu_commonutils/misc.h"
 
@@ -113,7 +113,7 @@ void CHydroBalance::WriteCharges(){
 	string filename=dirname+"/"+parmap.getS("CHARGESINFO_FILENAME","uds.dat");
 	printf("writing charges to %s\n",filename.c_str());
 	mapic::iterator it;
-	CCharge *charge;
+	CHBCharge *charge;
 	Chyper *hyper;
 	int balanceID;
 	unsigned int icharge;
@@ -151,7 +151,7 @@ void CHydroBalance::WriteCharges(){
 	chitotcharges.setZero();
 	int a,b;
 	it=emap.begin();
-	CCharge *charge1,*charge2;
+	CHBCharge *charge1,*charge2;
 	while(it!=emap.end()){
 		charge1=it->second;
 		++it;
@@ -170,7 +170,7 @@ void CHydroBalance::WriteCharges(){
 void CHydroBalance::ClearCharges(){
 	mapic::iterator it;
 	it=emap.begin();
-	CCharge *charge1,*charge2;
+	CHBCharge *charge1,*charge2;
 	while(it!=emap.end()){
 		charge1=it->second;
 		++it;
@@ -210,7 +210,7 @@ void CHydroBalance::WriteFinalCF(){
 	for(ieta=0;ieta<Netabins;ieta++)
 		cf[ieta].setZero(3,3);
 	mapic::iterator it;
-	CCharge *charge1,*charge2;
+	CHBCharge *charge1,*charge2;
 	it=emap.begin();
 	while(it!=emap.end()){
 		charge1=it->second;

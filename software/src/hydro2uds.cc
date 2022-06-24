@@ -1,7 +1,7 @@
 #include "msu_hydrobalance/hydro2uds.h"
 #include "msu_commonutils/randy.h"
-#include "msu_hydrobalance/eos.h"
-#include "msu_hydrobalance/charge.h"
+#include "msu_hydrobalance/hbeos.h"
+#include "msu_hydrobalance/hbcharge.h"
 using namespace std;
 
 CHydroBalance *CHydroMesh::hb=NULL;
@@ -15,7 +15,7 @@ CHydroBalance::CHydroBalance(string parfilename,int ranseed){
 	Tf=parmap.getD("FREEZEOUT_TEMP",0.155);
 	SIGMA0=parmap.getD("SIGMA0",0.5);
 	DiffusionRatio=parmap.getD("DIFFUSION_RATIO",1.0);
-	eos=new CEoS(&parmap);
+	eos=new CHBEoS(&parmap);
 	eos->ReadEoS_PST();
 	eos->BuildMap();
 	eos->GetEoSFromT_PST(Tf);
@@ -40,7 +40,7 @@ CHydroBalance::CHydroBalance(string parfilename,int ranseed){
 	mesh=newmesh=oldmesh=NULL;
 	Ncollisions=0;
 	CHydroMesh::hb=this;
-	CCharge::hb=this;
+	CHBCharge::hb=this;
 	tau0check=true;
 	tau0readcheck=true;
 	itauread=0;
@@ -128,7 +128,7 @@ void CHydroBalance::MakeCharges(){
 	int ix,iy,sign,a,b,itau;
 	double DQll,DQud,DQls,DQss,g1,g2;
 	Eigen::Matrix3d DQ(3,3);
-	CCharge *charge1,*charge2;
+	CHBCharge *charge1,*charge2;
 	for(ix=1;ix<mesh->NX-1;ix++){
 		for(iy=1;iy<=mesh->NY-1;iy++){
 			if(mesh->T[ix][iy]>Tf || newmesh->T[ix][iy]>Tf){
@@ -149,8 +149,8 @@ void CHydroBalance::MakeCharges(){
 						chitot(a,b)+=DQ(a,b);
 						while(ransum>ranthresh){
 							ranthresh+=randy->ran_exp();
-							charge1=new CCharge;
-							charge2=new CCharge;
+							charge1=new CHBCharge;
+							charge2=new CHBCharge;
 							mesh->GetXY(ix,iy,charge1->x,charge1->y);
 							charge1->x=charge2->x=XMIN+(ix+randy->ran())*DX;
 							charge1->y=charge2->y=YMIN+(iy+randy->ran())*DY;
@@ -213,7 +213,7 @@ void CHydroBalance::PropagateCharges(){
 	double dTdt,dTdx,dTdy,u0;
 	bool GGTt,GGTx,GGTy;
 	Chyper *hyper;
-	CCharge *charge;
+	CHBCharge *charge;
 	int ix,iy,ic,id;
 	double newtau=newmesh->tau;
 	it=cmap.begin();
@@ -272,13 +272,13 @@ void CHydroBalance::PropagateCharges(){
 void CHydroBalance::ScatterCharges(){
 	mapic::iterator it;
 	double u0,ux,uy,D;
-	CCharge *charge;
+	CHBCharge *charge;
 	int ix,iy;
 	it=cmap.begin();
 	while(it!=cmap.end()){
 		charge=it->second;
 		mesh->GetIXIY(charge->x,charge->y,ix,iy);
-		D=CEoS::GetD(newmesh->T[ix][iy]);
+		D=CHBEoS::GetD(newmesh->T[ix][iy]);
 		D*=DiffusionRatio;
 		ux=newmesh->UX[ix][iy];
 		uy=newmesh->UY[ix][iy];
@@ -298,7 +298,7 @@ void CHydroBalance::ScatterCharges(){
 void CHydroBalance::CalcDQ(int ix,int iy,double &DQll,
 double &DQud,double &DQls,double &DQss){
 	double d4x,s0,sx,sy;
-	CEoS eos222[2][2][2];
+	CHBEoS eos222[2][2][2];
 	int j0,jx,jy;
 	double ux[2][2][2],uy[2][2][2],u0[2][2][2];
 	CHydroMesh *mptr;

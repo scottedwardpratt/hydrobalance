@@ -1,4 +1,4 @@
-#include "msu_hydrobalance/charge.h"
+#include "msu_hydrobalance/hbcharge.h"
 #include "msu_commonutils/misc.h"
 #include "msu_sampler/hyper.h"
 #include "msu_hydrobalance/hydro2uds.h"
@@ -7,10 +7,10 @@
 
 using namespace std;
 
-CHydroBalance *CCharge::hb=NULL;
-CB3D *CCharge::b3d=NULL;
+CHydroBalance *CHBCharge::hb=NULL;
+CB3D *CHBCharge::b3d=NULL;
 
-void CCharge::Propagate(double newtau){
+void CHBCharge::Propagate(double newtau){
 	double t0,tf,neweta;
 	if(active==true){
 		t0=tau*cosh(eta);
@@ -26,7 +26,7 @@ void CCharge::Propagate(double newtau){
 	}
 }
 
-void CCharge::SetV(double uxmatter,double uymatter){
+void CHBCharge::SetV(double uxmatter,double uymatter){
 	double vz,vperp,phi,vmag=1.0;
 	FourVector v,umatter;
 	vz=vmag*(1.0-2.0*hb->randy->ran());
@@ -51,7 +51,7 @@ void CCharge::SetV(double uxmatter,double uymatter){
 	//printf("CHECK: %g\n",1.0-vx*vx-vy*vy-v[3]*v[3]/(v[0]*v[0]));
 }	
 
-void CCharge::Print(){
+void CHBCharge::Print(){
 	printf("Charge Info:\n");
 	if(active)
 		printf("active\n");

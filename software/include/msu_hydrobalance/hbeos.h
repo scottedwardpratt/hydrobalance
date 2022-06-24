@@ -7,13 +7,13 @@ using namespace std;
 typedef multimap<double,int> mapdi;
 typedef pair<double,int> pairdi;
 
-class CEoS{
+class CHBEoS{
 public:
 	CparameterMap *parmap;
 	double T,P,epsilon,s;
 	double chill,chiud,chils,chiss;
-	CEoS(CparameterMap *parmapset);
-	CEoS();
+	CHBEoS(CparameterMap *parmapset);
+	CHBEoS();
 	void ReadDiffusionData();
 	// get D in fm
 	static double GetD(double T);

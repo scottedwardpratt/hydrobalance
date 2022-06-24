@@ -15,9 +15,9 @@ public:
 	void add(double x1,double y1,double eta1,double tau1);
 };
 
-class CCharge{
+class CHBCharge{
 public:
-	~CCharge(){};
+	~CHBCharge(){};
 	bool active;
 	int q[3];
 	double x,y,eta,tau,weight,vx,vy,rapidity;
@@ -28,7 +28,7 @@ public:
 	static CHydroBalance *hb;
 	static CB3D *b3d;
 	CTrajInfo *trajinfo;
-	CCharge(){
+	CHBCharge(){
 		trajinfo=NULL;
 	};
 	void addtraj(){
