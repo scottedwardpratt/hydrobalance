@@ -315,6 +315,9 @@ double &DQud,double &DQls,double &DQss){
 				u0[j0][jx][jy]=sqrt(1.0
 					+ux[j0][jx][jy]*ux[j0][jx][jy]+uy[j0][jx][jy]*uy[j0][jx][jy]);
 				eos222[j0][jx][jy].GetEoSFromT_PST(mptr->T[ix+jx][iy+jy]);
+				if(mptr->T[ix+jx][iy+jy]>199.99 && mptr->T[ix+jx][iy+jy]<200.1){
+					printf("T=%g, s=%g\n",mptr->T[ix+jx][iy+jy],eos222[j0][ix+jx][iy+jy].s);
+				}
 				eos222[j0][jx][jy].GetChiOverS_Claudia();
 			}
 		}

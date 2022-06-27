@@ -1,8 +1,8 @@
 #include "msu_hydrobalance/hbeos.h"
-#include "msu_sampler/resonances.h"
+#include "msu_eos/resonances.h"
 #include "msu_commonutils/parametermap.h"
 #include "msu_commonutils/constants.h"
-#include "msu_sampler/eos.h"
+#include "msu_eos/eos.h"
 
 using namespace std;
 
@@ -219,10 +219,9 @@ void CHBEoS::ReadChiData_Claudia(){
 }
 
 void CHBEoS::GetChiOverS_Claudia(){
-	double delT=5.0,Tmax=0.4,w0,w1,Tm=1000.0*T;
+	double delT=5.0,Tmax=400,w0,w1,Tm=1000.0*T;
 	const int ndata=81;
 	int iT0;
-	//printf("In CHBEoS::GetChiOverS_Claudia, T=%g, Tm=%g\n",T,Tm);
 	if(Tm<20){
 		chill=chill_overs_claudia[5]*Tm*s/20.0;
 		chiud=chiud_overs_claudia[5]*Tm*s/20.0;
