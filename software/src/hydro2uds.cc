@@ -11,6 +11,7 @@ CHydroBalance::CHydroBalance(){
 };
 
 CHydroBalance::CHydroBalance(string parfilename,int ranseed){
+	printf("parfilename=%s\n",parfilename.c_str());
 	parmap.ReadParsFromFile(parfilename);
 	Tf=parmap.getD("FREEZEOUT_TEMP",0.155);
 	SIGMA0=parmap.getD("SIGMA0",0.5);
