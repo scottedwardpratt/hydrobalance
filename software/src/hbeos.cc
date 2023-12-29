@@ -6,6 +6,7 @@
 
 using namespace std;
 
+
 vector<double> CHBEoS::epsilon_PST,CHBEoS::P_PST,CHBEoS::s_PST,CHBEoS::T_PST;
 vector<double> CHBEoS::epsilon_claudia,CHBEoS::P_claudia,CHBEoS::s_claudia,CHBEoS::T_claudia;
 vector<double> CHBEoS::twopiTD,CHBEoS::Tdiff;

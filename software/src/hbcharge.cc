@@ -6,6 +6,7 @@
 #include "msu_commonutils/constants.h"
 
 using namespace std;
+using namespace NMSUPratt;
 
 CHydroBalance *CHBCharge::hb=NULL;
 CB3D *CHBCharge::b3d=NULL;

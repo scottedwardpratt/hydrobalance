@@ -4,6 +4,7 @@
 #include "msu_commonutils/misc.h"
 
 using namespace std;
+using namespace NMSUPratt;
 
 bool CHydroBalance::ReadOSCAR(CHydroMesh *hydromesh){
 	double r,x,y,rmax=0.0,highestT,biggestU,ur;

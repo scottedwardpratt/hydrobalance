@@ -6,6 +6,7 @@
 #include "msu_commonutils/constants.h"
 
 using namespace std;
+using namespace NMSUPratt;
 
 CTrajInfo::CTrajInfo(int IDset){
 	balanceID=IDset;

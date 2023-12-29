@@ -1,7 +1,7 @@
 #include "msu_hydrobalance/hydro2uds.h"
 
 using namespace std;
-
+using namespace NMSUPratt;
 
 int CHydroMesh::NX=0;
 int CHydroMesh::NY=0;

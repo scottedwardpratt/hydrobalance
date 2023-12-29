@@ -3,6 +3,7 @@
 #include "msu_commonutils/misc.h"
 
 using namespace std;
+using namespace NMSUPratt;
 
 void CHydroBalance::HyperFind(){
 	int ix,iy,a,b;

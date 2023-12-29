@@ -2,7 +2,9 @@
 #include "msu_commonutils/randy.h"
 #include "msu_hydrobalance/hbeos.h"
 #include "msu_hydrobalance/hbcharge.h"
+
 using namespace std;
+using namespace NMSUPratt;
 
 CHydroBalance *CHydroMesh::hb=NULL;
 
